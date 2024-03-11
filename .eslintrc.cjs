@@ -14,5 +14,15 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    'quotes': [
+      'warn',
+      'single', {
+        'allowTemplateLiterals': true
+      }
+    ],
+    'semi': [
+      'warn',
+      'never'
+    ]
   },
 }
