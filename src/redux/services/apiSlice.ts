@@ -9,7 +9,7 @@ export const weeklyTaskTrackerApi = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: '',
         prepareHeaders(headers, { getState }) {
-            headers.set('Authorization', `Bearer ${getState() as RootState}`)
+            headers.set('Authorization', `Bearer ${(getState() as RootState).auth.token}`)
             return headers
         }
     }),
