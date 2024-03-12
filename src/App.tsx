@@ -19,6 +19,7 @@ function App() {
           <Route index element={<Navigate to="/task-tracker/weekly-view" replace />} />
           <Route path="/task-tracker/weekly-view" element={<WeeklyView />} />
           <Route path="/task-tracker/task-editor" element={<TaskEditor />} />
+          <Route path="/task-tracker/*" element={<Navigate replace to="/task-tracker" />} />
         </Route>
         <Route path="*" element={<Navigate replace to="/home" />} />
       </Routes>

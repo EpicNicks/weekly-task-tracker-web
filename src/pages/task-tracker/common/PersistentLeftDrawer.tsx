@@ -82,6 +82,16 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
         setOpen(false)
     }
 
+    const drawerTitle = (() => {
+        if (location.pathname.includes('weekly-view')) {
+            return 'Weekly View'
+        }
+        if (location.pathname.includes('task-editor')) {
+            return 'Task Editor'
+        }
+        return ''
+    })()
+
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
@@ -97,7 +107,7 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">
-                        Persistent drawer
+                        {drawerTitle}
                     </Typography>
                 </Toolbar>
             </AppBar>
