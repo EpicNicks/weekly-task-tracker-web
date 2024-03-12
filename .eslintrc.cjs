@@ -20,6 +20,10 @@ module.exports = {
         'allowTemplateLiterals': true
       }
     ],
+    'jsx-quotes': [
+      'warn',
+      'prefer-double'
+    ],
     'semi': [
       'warn',
       'never'
