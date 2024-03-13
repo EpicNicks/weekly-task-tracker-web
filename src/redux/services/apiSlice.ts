@@ -44,8 +44,11 @@ export const weeklyTaskTrackerApi = createApi({
 })
 
 export const {
+    // account
     useGetIsUsernameAvailableQuery,
     useGetUserInfoQuery,
     usePostRegisterUserMutation,
-    usePostLoginMutation
+    usePostLoginMutation,
+    // tasks
+    useGetAllTasksQuery,
 } = weeklyTaskTrackerApi
