@@ -10,13 +10,15 @@ import MenuIcon from '@mui/icons-material/Menu'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import Typography from '@mui/material/Typography'
-import { Divider, List, ListItemButton } from '@mui/material'
+import { Container, Divider, List, ListItemButton, Stack } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { P, match } from 'ts-pattern'
+import DailyViewAppbar from './DailyViewAppbar'
 
 const drawerWidth = 200
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
-    open?: boolean;
+    open?: boolean
 }>(({ theme, open }) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
@@ -35,7 +37,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
 }))
 
 interface AppBarProps extends MuiAppBarProps {
-    open?: boolean;
+    open?: boolean
 }
 
 const AppBar = styled(MuiAppBar, {
@@ -65,7 +67,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }))
 
 interface PersistentDrawerProps {
-    children: React.ReactNode;
+    children: React.ReactNode
 }
 
 export default function PersistentDrawer({ children }: PersistentDrawerProps) {
@@ -82,15 +84,21 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
         setOpen(false)
     }
 
-    const drawerTitle = (() => {
-        if (location.pathname.includes('weekly-view')) {
-            return 'Weekly View'
-        }
-        if (location.pathname.includes('task-editor')) {
-            return 'Task Editor'
-        }
-        return ''
-    })()
+    type ViewLocation = 'today-view' | 'weekly-view' | 'task-editor' | 'none'
+
+    const currentView = match<typeof location, ViewLocation>(location)
+        .with({ pathname: P.when(path => path.includes('today-view')) }, () => 'today-view')
+        .with({ pathname: P.when(path => path.includes('weekly-view')) }, () => 'weekly-view')
+        .with({ pathname: P.when(path => path.includes('task-editor')) }, () => 'task-editor')
+        .otherwise(() => 'none')
+
+    const drawerTitle =
+        match(currentView)
+            .with('today-view', () => 'Today\'s Tasks')
+            .with('weekly-view', () => 'Weekly View')
+            .with('task-editor', () => 'Task Editor')
+            .with('none', () => '')
+            .exhaustive()
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -106,9 +114,18 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap component="div">
-                        {drawerTitle}
-                    </Typography>
+                    <Container maxWidth="lg">
+                        <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+                            <Typography variant="h5" noWrap component="div">
+                                {drawerTitle}
+                            </Typography>
+                            {
+                                match(currentView)
+                                    .with('today-view', () => <DailyViewAppbar />)
+                                    .otherwise(() => <></>)
+                            }
+                        </Stack>
+                    </Container>
                 </Toolbar>
             </AppBar>
             <Drawer
@@ -132,7 +149,17 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
                 <Divider />
                 <List>
                     <ListItemButton
-                        selected={location.pathname.includes('weekly-view')}
+                        selected={currentView === 'today-view'}
+                        onClick={() => {
+                            navigate('/task-tracker/today-view')
+                        }}
+                    >
+                        <Typography textAlign="center" width="100%">
+                            Today's Tasks
+                        </Typography>
+                    </ListItemButton>
+                    <ListItemButton
+                        selected={currentView === 'weekly-view'}
                         onClick={() => {
                             navigate('/task-tracker/weekly-view')
                         }}
@@ -142,7 +169,7 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
                         </Typography>
                     </ListItemButton>
                     <ListItemButton
-                        selected={location.pathname.includes('task-editor')}
+                        selected={currentView === 'task-editor'}
                         onClick={() => {
                             navigate('/task-tracker/task-editor')
                         }}

@@ -35,6 +35,8 @@ export const weeklyTaskTrackerApi = createApi({
                 method: 'POST'
             }),
         }),
+        // task routes
+        
     }),
 })
 
