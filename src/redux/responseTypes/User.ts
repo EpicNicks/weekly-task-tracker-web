@@ -1,7 +1,5 @@
-import { Result } from './Result'
-
-export type User = Result<{
+export type User = {
     id: number
     username: string
     points: number
-}>
+}

@@ -2,6 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { Result } from '../responseTypes/Result'
 import { User } from '../responseTypes/User'
 import { RootState } from '../store'
+import { Task } from '../responseTypes/Task'
 
 export const weeklyTaskTrackerApi = createApi({
     reducerPath: 'weeklyTaskTrackerApi',
@@ -18,7 +19,7 @@ export const weeklyTaskTrackerApi = createApi({
         getIsUsernameAvailable: builder.query<Result<boolean>, string>({
             query: (username) => `/account/available/${username}`,
         }),
-        getUserInfo: builder.query<User, void>({
+        getUserInfo: builder.query<Result<User>, void>({
             query: () => '/userInfo',
         }),
         postRegisterUser: builder.mutation<Result<void>, { username: string, password: string }>({
@@ -36,7 +37,9 @@ export const weeklyTaskTrackerApi = createApi({
             }),
         }),
         // task routes
-        
+        getAllTasks: builder.query<Result<Task[]>, void>({
+            query: () => '/tasks'
+        }),
     }),
 })
 
