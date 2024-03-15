@@ -1,7 +1,7 @@
-import { Card, Divider, Grid, IconButton, Stack, Typography } from '@mui/material'
-import { UserPrefs } from '../../../redux/services/userPrefs'
+import { Card, Divider, Grid, Stack, Typography } from '@mui/material'
+import { UserPrefs } from '../../../../redux/services/userPrefs'
 import { match } from 'ts-pattern'
-import { AddCircle } from '@mui/icons-material'
+import TaskLogButton from './TaskLogButton'
 
 export interface DailyTaskCardProps {
     taskColor: string
@@ -37,13 +37,11 @@ export default function DailyTaskCard(props: DailyTaskCardProps) {
                                 <Stack direction="column" spacing={1}>
                                     <Typography variant="h3">{taskName}</Typography>
                                     <Divider color={taskColor.substring(0, 6)} />
-                                    <Typography pt={2} variant="h4">Time spent today: {timeString()}</Typography>
+                                    <Typography pt={2} variant="h5">Time spent today: {timeString()}</Typography>
                                 </Stack>
                             </Grid>
                             <Grid item ml={1} xs={1}>
-                                <IconButton>
-                                    <AddCircle sx={{ fontSize: '50px', color: taskColor }} />
-                                </IconButton>
+                                <TaskLogButton taskProps={props} />
                             </Grid>
                         </Grid>
                     ))
@@ -55,9 +53,7 @@ export default function DailyTaskCard(props: DailyTaskCardProps) {
                             <Grid item xs={4}>
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <Typography variant="h4">{timeString()}</Typography>
-                                    <IconButton>
-                                        <AddCircle sx={{ fontSize: '50px', color: taskColor }} />
-                                    </IconButton>
+                                    <TaskLogButton taskProps={props} />
                                 </Stack>
                             </Grid>
                         </Grid>

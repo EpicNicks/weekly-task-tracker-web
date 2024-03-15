@@ -1,5 +1,5 @@
 import { Box, Card, CircularProgress, Container } from '@mui/material'
-import DailyTaskCard from '../common/DailyTaskCard'
+import DailyTaskCard from '../common/daily-task-card/DailyTaskCard'
 import { useAppSelector } from '../../../redux/hooks'
 import { useGetAllTasksQuery } from '../../../redux/services/apiSlice'
 

@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom'
 import { Button, Container, Grid, Paper, TextField, Typography } from '@mui/material'
 import styled from '@emotion/styled'
 import { keyframes } from '@emotion/react'
-import { Formik } from 'formik'
+import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
 import { useAppSelector } from '../../redux/hooks'
 import { usePostLoginMutation } from '../../redux/services/apiSlice'
@@ -66,86 +66,88 @@ function Login() {
                     password: Yup.string().required(),
                 })}
             >
-                <StyledDiv>
-                    <Container
-                        maxWidth="xs"
-                    >
-                        <Grid
-                            container
-                            direction="column"
-                            justifyContent="center"
-                            minHeight="100vh"
-                            spacing={1}
+                <Form>
+                    <StyledDiv>
+                        <Container
+                            maxWidth="xs"
                         >
-                            <Paper elevation={1}>
-                                <Grid
-                                    container
-                                    direction="column"
-                                    justifyContent="center"
-                                    spacing={1}
-                                    pt="50px"
-                                    pb="50px"
-                                >
-                                    <Grid item pb={4}>
-                                        <Container>
-                                            <StyledPaper color="#1f73ae">
-                                                <Typography variant="h3" color="white" textAlign="center">
-                                                    FreeTime
-                                                </Typography>
-                                            </StyledPaper>
-                                        </Container>
+                            <Grid
+                                container
+                                direction="column"
+                                justifyContent="center"
+                                minHeight="100vh"
+                                spacing={1}
+                            >
+                                <Paper elevation={1}>
+                                    <Grid
+                                        container
+                                        direction="column"
+                                        justifyContent="center"
+                                        spacing={1}
+                                        pt="50px"
+                                        pb="50px"
+                                    >
+                                        <Grid item pb={4}>
+                                            <Container>
+                                                <StyledPaper color="#1f73ae">
+                                                    <Typography variant="h3" color="white" textAlign="center">
+                                                        FreeTime
+                                                    </Typography>
+                                                </StyledPaper>
+                                            </Container>
+                                        </Grid>
+                                        <Grid item xs={12} pb={4}>
+                                            <Typography variant="h6" textAlign="center">
+                                                Log in to continue
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Container>
+                                                <StyledTextField
+                                                    required
+                                                    id="username"
+                                                    name="username"
+                                                    label="Username"
+                                                    type="username"
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    disabled={loginResult.isLoading}
+                                                />
+                                            </Container>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Container>
+                                                <StyledTextField
+                                                    required
+                                                    id="password"
+                                                    name="password"
+                                                    label="Password"
+                                                    type="password"
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    disabled={loginResult.isLoading}
+                                                />
+                                            </Container>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Container>
+                                                <StyledSubmitButton
+                                                    type="submit"
+                                                    variant="contained"
+                                                    color="primary"
+                                                    fullWidth
+                                                    disabled={loginResult.isLoading}
+                                                >
+                                                    Login
+                                                </StyledSubmitButton>
+                                            </Container>
+                                        </Grid>
                                     </Grid>
-                                    <Grid item xs={12} pb={4}>
-                                        <Typography variant="h6" textAlign="center">
-                                            Log in to continue
-                                        </Typography>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Container>
-                                            <StyledTextField
-                                                required
-                                                id="username"
-                                                name="username"
-                                                label="Username"
-                                                type="username"
-                                                variant="outlined"
-                                                fullWidth
-                                                disabled={loginResult.isLoading}
-                                            />
-                                        </Container>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Container>
-                                            <StyledTextField
-                                                required
-                                                id="password"
-                                                name="password"
-                                                label="Password"
-                                                type="password"
-                                                variant="outlined"
-                                                fullWidth
-                                                disabled={loginResult.isLoading}
-                                            />
-                                        </Container>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Container>
-                                            <StyledSubmitButton
-                                                type="submit"
-                                                variant="contained"
-                                                color="primary"
-                                                fullWidth
-                                                disabled={loginResult.isLoading}
-                                            >
-                                                Login
-                                            </StyledSubmitButton>
-                                        </Container>
-                                    </Grid>
-                                </Grid>
-                            </Paper>
-                        </Grid>
-                    </Container>
-                </StyledDiv>
+                                </Paper>
+                            </Grid>
+                        </Container>
+                    </StyledDiv>
+                </Form>
             </Formik >
         </>
     )
