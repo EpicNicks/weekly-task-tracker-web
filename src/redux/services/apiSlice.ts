@@ -16,7 +16,7 @@ export const weeklyTaskTrackerApi = createApi({
             return headers
         }
     }),
-    tagTypes: ['Tasks'],
+    tagTypes: ['Tasks', 'Logs'],
     endpoints: (builder) => ({
         // account routes
         getIsUsernameAvailable: builder.query<Result<boolean>, string>({
@@ -52,12 +52,21 @@ export const weeklyTaskTrackerApi = createApi({
             query: (id) => `/tasks/${id}`,
             providesTags: ['Tasks']
         }),
+        createNewTask: builder.mutation<Result<Task>, { taskName: string, rgbTaskColor: string, weeklyTargetMinutes: number }>({
+            query: (body) => ({
+                url: '/tasks/create',
+                body,
+                method: 'POST'
+            }),
+            invalidatesTags: ['Tasks']
+        }),
 
         //daily log routes
         getLogsForDate: builder.query<Result<DailyLog[]>, Date>({
-            query: (date) => `/logs/${DateFormat(date)}`
+            query: (date) => `/logs/${DateFormat(date)}`,
+            providesTags: ['Logs']
         }),
-        createLog: builder.mutation<Result<DailyLog>, {logDate: Date, dailyTimeMinutes: number, taskId: number}>({
+        createLog: builder.mutation<Result<DailyLog>, { logDate: Date, dailyTimeMinutes: number, taskId: number }>({
             query: (body) => ({
                 url: `/logs/create`,
                 body: {
@@ -66,7 +75,8 @@ export const weeklyTaskTrackerApi = createApi({
                     taskId: body.taskId,
                 },
                 method: 'POST'
-            })
+            }),
+            invalidatesTags: ['Logs']
         }),
         updateLogMinutes: builder.mutation<Result<DailyLog>, { date: Date, dailyTimeMinutes: number, taskId: number }>({
             query: (body) => ({
@@ -76,7 +86,8 @@ export const weeklyTaskTrackerApi = createApi({
                     taskId: body.taskId,
                 },
                 method: 'PATCH'
-            })
+            }),
+            invalidatesTags: ['Logs']
         }),
     }),
 })
@@ -91,6 +102,7 @@ export const {
     useGetAllTasksQuery,
     useGetActiveTasksQuery,
     useGetTaskByIdQuery,
+    useCreateNewTaskMutation,
     // daily logs
     useGetLogsForDateQuery,
     useCreateLogMutation,
