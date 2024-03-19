@@ -95,6 +95,7 @@ export const weeklyTaskTrackerApi = createApi({
 export const {
     // account
     useGetIsUsernameAvailableQuery,
+    useLazyGetIsUsernameAvailableQuery,
     useGetUserInfoQuery,
     usePostRegisterUserMutation,
     usePostLoginMutation,

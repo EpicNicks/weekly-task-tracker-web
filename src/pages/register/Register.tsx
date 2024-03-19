@@ -3,7 +3,7 @@ import styled from '@emotion/styled'
 import { keyframes } from '@emotion/react'
 import { Formik, Form, FormikProps } from 'formik'
 import * as Yup from 'yup'
-import { usePostLoginMutation, usePostRegisterUserMutation } from '../../redux/services/apiSlice'
+import { useLazyGetIsUsernameAvailableQuery, usePostLoginMutation, usePostRegisterUserMutation } from '../../redux/services/apiSlice'
 import { useNavigate } from 'react-router-dom'
 
 const scrollAnimation = keyframes`
@@ -46,6 +46,7 @@ const StyledDiv = styled.div`
 export default function Register() {
     const [postRegister, registerResult] = usePostRegisterUserMutation()
     const [postLogin,] = usePostLoginMutation()
+    const [getUsernameTaken,] = useLazyGetIsUsernameAvailableQuery()
     const navigate = useNavigate()
 
     const GenericErrorText = ({ formik, fieldName }: { formik: FormikProps<{ username: string, password: string, reenteredPassword: string }>, fieldName: keyof typeof formik.values }) => {
@@ -74,14 +75,21 @@ export default function Register() {
                                     password: '',
                                     reenteredPassword: '',
                                 }}
-                                onSubmit={({ username, password }) => {
-                                    postRegister({ username, password }).unwrap().then((res) => {
-                                        if (res.success){
-                                            postLogin({username, password}).unwrap().then((res) => {
-                                                if (res.success){
-                                                    navigate('/task-tracker')
+                                onSubmit={({ username, password }, formikBag) => {
+                                    getUsernameTaken(username, true).unwrap().then((res) => {
+                                        if (res.success && !res.value) {
+                                            postRegister({ username, password }).unwrap().then((res) => {
+                                                if (res.success) {
+                                                    postLogin({ username, password }).unwrap().then((res) => {
+                                                        if (res.success) {
+                                                            navigate('/task-tracker')
+                                                        }
+                                                    })
                                                 }
                                             })
+                                        }
+                                        else {
+                                            formikBag.setFieldError('username', 'Username is already taken')
                                         }
                                     })
                                 }}
@@ -130,7 +138,14 @@ export default function Register() {
                                                             id="username"
                                                             name="username"
                                                             onChange={formikProps.handleChange}
-                                                            onBlur={formikProps.handleBlur}
+                                                            onBlur={() => {
+                                                                getUsernameTaken(formikProps.values.username, true).unwrap()
+                                                                    .then((res) => {
+                                                                        if (res.success && res.value) {
+                                                                            formikProps.setFieldError('username', 'Username is already taken')
+                                                                        }
+                                                                    })
+                                                            }}
                                                             label="Username"
                                                             type="username"
                                                             variant="outlined"

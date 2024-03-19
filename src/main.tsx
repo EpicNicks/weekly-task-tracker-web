@@ -6,7 +6,7 @@ import { store } from './redux/store.ts'
 import './main.css'
 import { invalidateToken } from './redux/services/authSlice.ts'
 
-window.onclose = () => {
+window.onbeforeunload = () => {
   invalidateToken()
 }
 
