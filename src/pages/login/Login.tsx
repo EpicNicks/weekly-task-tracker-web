@@ -1,11 +1,11 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { Button, Container, Grid, Paper, TextField, Typography } from '@mui/material'
 import styled from '@emotion/styled'
 import { keyframes } from '@emotion/react'
 import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
-import { useAppSelector } from '../../redux/hooks'
 import { usePostLoginMutation } from '../../redux/services/apiSlice'
+import { getUserToken } from '../../redux/services/authSlice'
 
 const scrollAnimation = keyframes`
     0% {
@@ -46,109 +46,120 @@ const StyledDiv = styled.div`
 
 function Login() {
     const [postLogin, loginResult] = usePostLoginMutation()
-    const token = useAppSelector(store => store.auth.token)
+    const navigate = useNavigate()
+    const token = getUserToken()
 
     if (token) {
         return <Navigate to="task-tracker" replace />
     }
     return (
         <>
-            <Formik
-                initialValues={{
-                    username: '',
-                    password: ''
-                }}
-                onSubmit={({ username, password }) => {
-                    postLogin({ username, password })
-                }}
-                validationSchema={Yup.object().shape({
-                    username: Yup.string().required(),
-                    password: Yup.string().required(),
-                })}
-            >
-                <Form>
-                    <StyledDiv>
-                        <Container
-                            maxWidth="xs"
-                        >
-                            <Grid
-                                container
-                                direction="column"
-                                justifyContent="center"
-                                minHeight="100vh"
-                                spacing={1}
+            <StyledDiv>
+                <Container
+                    maxWidth="xs"
+                >
+                    <Grid
+                        container
+                        direction="column"
+                        justifyContent="center"
+                        minHeight="100vh"
+                        spacing={1}
+                    >
+                        <Paper elevation={1}>
+                            <Formik
+                                initialValues={{
+                                    username: '',
+                                    password: ''
+                                }}
+                                onSubmit={({ username, password }) => {
+                                    postLogin({ username, password }).unwrap().then((res) => {
+                                        if (res.success){
+                                            navigate('/time-tracker')
+                                        }
+                                    })
+                                }}
+                                validationSchema={Yup.object().shape({
+                                    username: Yup.string().required(),
+                                    password: Yup.string().required(),
+                                })}
                             >
-                                <Paper elevation={1}>
-                                    <Grid
-                                        container
-                                        direction="column"
-                                        justifyContent="center"
-                                        spacing={1}
-                                        pt="50px"
-                                        pb="50px"
-                                    >
-                                        <Grid item pb={4}>
-                                            <Container>
-                                                <StyledPaper color="#1f73ae">
-                                                    <Typography variant="h3" color="white" textAlign="center">
-                                                        FreeTime
+                                {
+                                    formikProps => (
+                                        <Form>
+                                            <Grid
+                                                container
+                                                direction="column"
+                                                justifyContent="center"
+                                                spacing={1}
+                                                pt="50px"
+                                                pb="50px"
+                                            >
+                                                <Grid item pb={4}>
+                                                    <Container>
+                                                        <StyledPaper color="#1f73ae">
+                                                            <Typography variant="h3" color="white" textAlign="center">
+                                                                FreeTime
+                                                            </Typography>
+                                                        </StyledPaper>
+                                                    </Container>
+                                                </Grid>
+                                                <Grid item xs={12} pb={4}>
+                                                    <Typography variant="h6" textAlign="center">
+                                                        Log in to continue
                                                     </Typography>
-                                                </StyledPaper>
-                                            </Container>
-                                        </Grid>
-                                        <Grid item xs={12} pb={4}>
-                                            <Typography variant="h6" textAlign="center">
-                                                Log in to continue
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <Container>
-                                                <StyledTextField
-                                                    required
-                                                    id="username"
-                                                    name="username"
-                                                    label="Username"
-                                                    type="username"
-                                                    variant="outlined"
-                                                    fullWidth
-                                                    disabled={loginResult.isLoading}
-                                                />
-                                            </Container>
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <Container>
-                                                <StyledTextField
-                                                    required
-                                                    id="password"
-                                                    name="password"
-                                                    label="Password"
-                                                    type="password"
-                                                    variant="outlined"
-                                                    fullWidth
-                                                    disabled={loginResult.isLoading}
-                                                />
-                                            </Container>
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <Container>
-                                                <StyledSubmitButton
-                                                    type="submit"
-                                                    variant="contained"
-                                                    color="primary"
-                                                    fullWidth
-                                                    disabled={loginResult.isLoading}
-                                                >
-                                                    Login
-                                                </StyledSubmitButton>
-                                            </Container>
-                                        </Grid>
-                                    </Grid>
-                                </Paper>
-                            </Grid>
-                        </Container>
-                    </StyledDiv>
-                </Form>
-            </Formik >
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Container>
+                                                        <StyledTextField
+                                                            required
+                                                            id="username"
+                                                            name="username"
+                                                            onChange={formikProps.handleChange}
+                                                            label="Username"
+                                                            type="username"
+                                                            variant="outlined"
+                                                            fullWidth
+                                                            disabled={loginResult.isLoading}
+                                                        />
+                                                    </Container>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Container>
+                                                        <StyledTextField
+                                                            required
+                                                            id="password"
+                                                            name="password"
+                                                            onChange={formikProps.handleChange}
+                                                            label="Password"
+                                                            type="password"
+                                                            variant="outlined"
+                                                            fullWidth
+                                                            disabled={loginResult.isLoading}
+                                                        />
+                                                    </Container>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Container>
+                                                        <StyledSubmitButton
+                                                            type="submit"
+                                                            variant="contained"
+                                                            color="primary"
+                                                            fullWidth
+                                                            disabled={loginResult.isLoading}
+                                                        >
+                                                            Login
+                                                        </StyledSubmitButton>
+                                                    </Container>
+                                                </Grid>
+                                            </Grid>
+                                        </Form>
+                                    )
+                                }
+                            </Formik >
+                        </Paper>
+                    </Grid>
+                </Container>
+            </StyledDiv>
         </>
     )
 }

@@ -1,15 +1,14 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { useAppSelector } from '../../redux/hooks'
 import PersistentLeftDrawer from './common/drawer/PersistentLeftDrawer'
+import { getUserToken } from '../../redux/services/authSlice'
 
 // main actual app route, subroutes would go under here
 export default function TaskTracker() {
-    const token = useAppSelector(state => state.auth.token)
+    const token = getUserToken()
 
-    // commented out for testing
-    // if (!token) {
-    //     return <Navigate replace to="/login" />
-    // }
+    if (!token) {
+        return <Navigate replace to="/login" />
+    }
     return (
         <PersistentLeftDrawer>
             <Outlet />

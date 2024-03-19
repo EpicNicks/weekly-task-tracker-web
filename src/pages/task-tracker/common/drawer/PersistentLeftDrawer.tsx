@@ -84,19 +84,23 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
         setOpen(false)
     }
 
-    type ViewLocation = 'today-view' | 'weekly-view' | 'task-editor' | 'none'
+    type ViewLocation = 'home' | 'today-view' | 'weekly-view' | 'task-editor' | 'account' | 'none'
 
     const currentView = match<typeof location, ViewLocation>(location)
-        .with({ pathname: P.when(path => path.includes('today-view')) }, () => 'today-view')
-        .with({ pathname: P.when(path => path.includes('weekly-view')) }, () => 'weekly-view')
-        .with({ pathname: P.when(path => path.includes('task-editor')) }, () => 'task-editor')
-        .otherwise(() => 'none')
+        .with({ pathname: P.when(path => path.includes('today-view')) }, () => 'today-view' as const)
+        .with({ pathname: P.when(path => path.includes('weekly-view')) }, () => 'weekly-view' as const)
+        .with({ pathname: P.when(path => path.includes('task-editor')) }, () => 'task-editor' as const)
+        .with({ pathname: P.when(path => path.includes('account')) }, () => 'account' as const)
+        .with({ pathname: P.when(path => path.includes('home')) }, () => 'home' as const)
+        .otherwise(() => 'none' as const)
 
     const drawerTitle =
         match(currentView)
             .with('today-view', () => 'Today\'s Tasks')
             .with('weekly-view', () => 'Weekly View')
             .with('task-editor', () => 'Task Editor')
+            .with('account', () => 'Account Management')
+            .with('home', () => 'Going Home...')
             .with('none', () => '')
             .exhaustive()
 
@@ -149,6 +153,14 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
                 <Divider />
                 <List>
                     <ListItemButton
+                        selected={false}
+                        onClick={() => navigate('/home')}
+                    >
+                        <Typography textAlign="center" width="100%">
+                            Home
+                        </Typography>
+                    </ListItemButton>
+                    <ListItemButton
                         selected={currentView === 'today-view'}
                         onClick={() => {
                             navigate('/task-tracker/today-view')
@@ -176,6 +188,16 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
                     >
                         <Typography textAlign="center" width="100%">
                             Task Editor
+                        </Typography>
+                    </ListItemButton>
+                    <ListItemButton
+                        selected={currentView === 'account'}
+                        onClick={() => {
+                            navigate('/task-tracker/account')
+                        }}
+                    >
+                        <Typography textAlign="center" width="100%">
+                            Account Management
                         </Typography>
                     </ListItemButton>
                 </List>

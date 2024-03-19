@@ -6,6 +6,7 @@ import WeeklyView from './pages/task-tracker/weekly-view/WeeklyView'
 import TaskEditor from './pages/task-tracker/task-editor/TaskEditor'
 import TaskTracker from './pages/task-tracker/TaskTracker'
 import TodayView from './pages/task-tracker/today-view/TodayView'
+import AccountManagement from './pages/account-management/AccountManagement'
 // import { ErrorBoundary } from './pages/ErrorBoundary'
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/task-tracker/today-view" element={<TodayView />} />
           <Route path="/task-tracker/weekly-view" element={<WeeklyView />} />
           <Route path="/task-tracker/task-editor" element={<TaskEditor />} />
+          <Route path="/task-tracker/account" element={<AccountManagement />} />
           <Route path="/task-tracker/*" element={<Navigate replace to="/task-tracker" />} />
         </Route>
         <Route path="*" element={<Navigate replace to="/home" />} />
