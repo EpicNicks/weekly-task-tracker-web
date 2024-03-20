@@ -6,6 +6,7 @@ import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
 import { usePostLoginMutation } from '../../redux/services/apiSlice'
 import { getUserToken } from '../../redux/services/authSlice'
+import GenericErrorText from '../task-tracker/common/GenericErrorText'
 
 const scrollAnimation = keyframes`
     0% {
@@ -71,12 +72,23 @@ function Login() {
                                     username: '',
                                     password: ''
                                 }}
-                                onSubmit={({ username, password }) => {
-                                    postLogin({ username, password }).unwrap().then((res) => {
-                                        if (res.success){
-                                            navigate('/time-tracker')
-                                        }
-                                    })
+                                onSubmit={({ username, password }, formikBag) => {
+                                    postLogin({ username, password }).unwrap()
+                                        .then((res) => {
+                                            if (res.success) {
+                                                navigate('/task-tracker')
+                                            }
+                                        })
+                                        .catch((error) => {
+                                            if ('status' in error) {
+                                                if (error.status.toString() === '401') {
+                                                    formikBag.setFieldError('password', 'Incorrect password provided')
+                                                }
+                                                else {
+                                                    formikBag.setFieldError('password', 'Server error. Please contact an administrator.')
+                                                }
+                                            }
+                                        })
                                 }}
                                 validationSchema={Yup.object().shape({
                                     username: Yup.string().required(),
@@ -121,6 +133,7 @@ function Login() {
                                                             fullWidth
                                                             disabled={loginResult.isLoading}
                                                         />
+                                                        <GenericErrorText formik={formikProps} fieldName="username" />
                                                     </Container>
                                                 </Grid>
                                                 <Grid item xs={12}>
@@ -136,6 +149,7 @@ function Login() {
                                                             fullWidth
                                                             disabled={loginResult.isLoading}
                                                         />
+                                                        <GenericErrorText formik={formikProps} fieldName="password" />
                                                     </Container>
                                                 </Grid>
                                                 <Grid item xs={12}>

@@ -4,7 +4,7 @@ import { User } from '../responseTypes/User'
 import { Task } from '../responseTypes/Task'
 import { getUserToken } from './authSlice'
 import { DailyLog } from '../responseTypes/DailyLog'
-import { DateFormat } from '../../common/components/DateFunctions'
+import { DateFormat } from '../../common/DateFunctions'
 
 export const weeklyTaskTrackerApi = createApi({
     reducerPath: 'weeklyTaskTrackerApi',
@@ -52,11 +52,19 @@ export const weeklyTaskTrackerApi = createApi({
             query: (id) => `/tasks/${id}`,
             providesTags: ['Tasks']
         }),
-        createNewTask: builder.mutation<Result<Task>, { taskName: string, rgbTaskColor: string, weeklyTargetMinutes: number }>({
+        createNewTask: builder.mutation<Result<Task>, { taskName: Task['taskName'], rgbTaskColor: Task['rgbTaskColor'], weeklyTargetMinutes: Task['weeklyTargetMinutes'] }>({
             query: (body) => ({
                 url: '/tasks/create',
                 body,
                 method: 'POST'
+            }),
+            invalidatesTags: ['Tasks']
+        }),
+        updateTask: builder.mutation<Result<Task>, Task>({
+            query: (body) => ({
+                url: `/update-task/${body.id}`,
+                body,
+                method: 'PATCH',
             }),
             invalidatesTags: ['Tasks']
         }),
@@ -104,6 +112,7 @@ export const {
     useGetActiveTasksQuery,
     useGetTaskByIdQuery,
     useCreateNewTaskMutation,
+    useUpdateTaskMutation,
     // daily logs
     useGetLogsForDateQuery,
     useCreateLogMutation,

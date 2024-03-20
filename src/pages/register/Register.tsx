@@ -1,10 +1,11 @@
 import { Button, Container, Grid, Paper, TextField, Typography } from '@mui/material'
 import styled from '@emotion/styled'
 import { keyframes } from '@emotion/react'
-import { Formik, Form, FormikProps } from 'formik'
+import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
 import { useLazyGetIsUsernameAvailableQuery, usePostLoginMutation, usePostRegisterUserMutation } from '../../redux/services/apiSlice'
 import { useNavigate } from 'react-router-dom'
+import GenericErrorText from '../task-tracker/common/GenericErrorText'
 
 const scrollAnimation = keyframes`
     0% {
@@ -48,12 +49,6 @@ export default function Register() {
     const [postLogin,] = usePostLoginMutation()
     const [getUsernameTaken,] = useLazyGetIsUsernameAvailableQuery()
     const navigate = useNavigate()
-
-    const GenericErrorText = ({ formik, fieldName }: { formik: FormikProps<{ username: string, password: string, reenteredPassword: string }>, fieldName: keyof typeof formik.values }) => {
-        return formik.touched[fieldName] && formik.errors[fieldName] && (
-            <Typography color="red">{formik.errors[fieldName]}</Typography>
-        )
-    }
 
     return (
         <>

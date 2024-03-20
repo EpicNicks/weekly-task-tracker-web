@@ -3,8 +3,6 @@ import { UserPrefs } from '../../../../redux/services/userPrefs'
 import { match } from 'ts-pattern'
 import TaskLogButton from './TaskLogButton'
 import { useGetLogsForDateQuery } from '../../../../redux/services/apiSlice'
-import { DateFormat } from '../../../../common/components/DateFunctions'
-import { DailyLog } from '../../../../redux/responseTypes/DailyLog'
 
 export interface DailyTaskCardProps {
     taskId: number
@@ -39,25 +37,6 @@ export default function DailyTaskCard(props: DailyTaskCardProps) {
         return <CircularProgress />
     }
     const dailyLogList = data.value
-
-
-    // FOR TESTING
-    // const dailyLogList: DailyLog[] = [
-    //     {
-    //         logDate: DateFormat(new Date()),
-    //         collectedPoints: false,
-    //         // relevant fields
-    //         dailyTimeMinutes: 369,
-    //         taskId: 1,
-    //     },
-    //     {
-    //         logDate: DateFormat(new Date()),
-    //         collectedPoints: false,
-    //         // relevant fields
-    //         dailyTimeMinutes: 300,
-    //         taskId: 2,
-    //     }
-    // ]
 
     const log = dailyLogList.find(log => log.taskId === taskId)
     const minutesLogged = log?.dailyTimeMinutes ?? 0

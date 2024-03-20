@@ -4,11 +4,6 @@ import { Provider } from 'react-redux'
 import App from './App.tsx'
 import { store } from './redux/store.ts'
 import './main.css'
-import { invalidateToken } from './redux/services/authSlice.ts'
-
-window.onbeforeunload = () => {
-  invalidateToken()
-}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
