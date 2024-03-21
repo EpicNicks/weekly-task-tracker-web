@@ -38,7 +38,10 @@ export default function TaskEditor() {
                                                     }}
                                                 >
                                                     <Stack direction="row" alignItems="center" justifyContent="space-between" m={2}>
-                                                        <Typography variant="h5">{task.taskName}</Typography>
+                                                        <Stack direction="column">
+                                                            <Typography variant="h5">{task.taskName}</Typography>
+                                                            <Typography variant="h6">Weekly Goal: {task.weeklyTargetMinutes / 60} hours</Typography>
+                                                        </Stack>
                                                         <Box>
                                                             <Tooltip title="Edit Task">
                                                                 <IconButton
@@ -73,13 +76,17 @@ export default function TaskEditor() {
                                                                     <Button onClick={() => {
                                                                         setDeleteTaskDialogOpen(false)
                                                                     }}>
-                                                                        Disagree
+                                                                        No
                                                                     </Button>
-                                                                    <Button onClick={() => {
-                                                                        patchDeactivateTask(task.id)
-                                                                        setDeleteTaskDialogOpen(false)
-                                                                    }}>
-                                                                        Agree
+                                                                    <Button
+                                                                        variant="contained"
+                                                                        color="error"
+                                                                        onClick={() => {
+                                                                            patchDeactivateTask(task.id)
+                                                                            setDeleteTaskDialogOpen(false)
+                                                                        }}
+                                                                    >
+                                                                        Yes
                                                                     </Button>
                                                                 </DialogActions>
                                                             </DialogContent>
