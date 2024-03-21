@@ -4,7 +4,7 @@ import { Formik, Form } from 'formik'
 import { match } from 'ts-pattern'
 import * as Yup from 'yup'
 import { randomRgbColor } from '../../../common/RandomFunctions'
-import { useCreateNewTaskMutation, useUpdateTaskMutation } from '../../../redux/services/apiSlice'
+import { useCreateNewTaskMutation, useLazyGetTaskByNameQuery, useUpdateTaskMutation } from '../../../redux/services/apiSlice'
 import GenericErrorText from '../common/GenericErrorText'
 import NumericField from '../common/daily-task-card/NumericField'
 import { Task } from '../../../redux/responseTypes/Task'
@@ -24,6 +24,7 @@ export default function TaskEditCard(props: TaskEditCardProps) {
 
     const [postCreateTask, createTaskResult] = useCreateNewTaskMutation()
     const [patchEditTask, editTaskResult] = useUpdateTaskMutation()
+    const [getTaskByName,] = useLazyGetTaskByNameQuery()
 
     const taskMode = !initialValues ? 'CREATE' : 'EDIT'
 
@@ -44,13 +45,13 @@ export default function TaskEditCard(props: TaskEditCardProps) {
             <Formik
                 initialValues={{
                     taskName: initialValues?.taskName ?? '',
-                    rgbTaskColor: initialValues?.rgbTaskColor ? `#${initialValues?.rgbTaskColor}` : randomRgbColor('hex'),
+                    rgbTaskColor: initialValues?.rgbTaskColor ? `#${initialValues?.rgbTaskColor?.substring(0, 6)}` : randomRgbColor('hex'),
                     target: (initialValues?.weeklyTargetMinutes ?? 0) / 60,
                     goalLength: 'weekly' as 'weekly' | 'daily' | 'monthly',
                     minuteHour: 'hour' as 'minute' | 'hour',
                 }}
                 onSubmit={({ taskName, rgbTaskColor, target, goalLength, minuteHour }) => {
-                    const sanitizedTaskColor = rgbTaskColor.substring(1).toUpperCase() + 'FF'
+                    const sanitizedTaskColor = rgbTaskColor.substring(1).toUpperCase().padEnd(8, 'F')
                     const weeklyTargetMinutes = (target ?? 0) * match(goalLength)
                         .with('daily', () => 7)
                         .with('weekly', () => 1)
@@ -99,18 +100,33 @@ export default function TaskEditCard(props: TaskEditCardProps) {
                             <Box sx={{ ...modalStyles, borderLeft: `10px solid ${formikProps.values.rgbTaskColor}` }}>
                                 <Stack direction="column" spacing={2}>
                                     <Typography variant="h5">{taskMode === 'CREATE' ? 'Create New Task' : 'Edit Task'}</Typography>
-                                    <TextField
-                                        label="Task Name"
-                                        name="taskName"
-                                        value={formikProps.values.taskName}
-                                        onChange={formikProps.handleChange}
-                                        onBlur={formikProps.handleBlur}
-                                        disabled={createTaskResult.isLoading}
-                                        inputProps={{
-                                            maxLength: 20
-                                        }}
-                                    />
-                                    <GenericErrorText formik={formikProps} fieldName="taskName" />
+                                    <Stack direction="column">
+                                        <TextField
+                                            label="Task Name"
+                                            name="taskName"
+                                            value={formikProps.values.taskName}
+                                            onChange={formikProps.handleChange}
+                                            onBlur={(e) => {
+                                                if (formikProps.values.taskName) {
+                                                    getTaskByName(formikProps.values.taskName, true).unwrap()
+                                                        .then((res) => {
+                                                            if (res.success && res.value) {
+                                                                formikProps.handleBlur(e)
+                                                                formikProps.setFieldError('taskName', 'You already have a task with this name')
+                                                            }
+                                                        })
+                                                }
+                                                else {
+                                                    formikProps.handleBlur(e)
+                                                }
+                                            }}
+                                            disabled={createTaskResult.isLoading}
+                                            inputProps={{
+                                                maxLength: 20
+                                            }}
+                                        />
+                                        <GenericErrorText formik={formikProps} fieldName="taskName" />
+                                    </Stack>
                                     <Stack direction="row" spacing={2} pl={2}>
                                         <Typography>Task Color</Typography>
                                         <input
@@ -160,10 +176,10 @@ export default function TaskEditCard(props: TaskEditCardProps) {
                                                     value={formikProps.values.minuteHour}
                                                     label=""
                                                     onChange={(e) => {
-                                                        if (e.target.value === 'hour'){
+                                                        if (e.target.value === 'hour') {
                                                             formikProps.setFieldValue('target', formikProps.values.target / 60)
                                                         }
-                                                        if (e.target.value === 'minute'){
+                                                        if (e.target.value === 'minute') {
                                                             formikProps.setFieldValue('target', formikProps.values.target * 60)
                                                         }
                                                         formikProps.handleChange(e)
@@ -216,7 +232,7 @@ export default function TaskEditCard(props: TaskEditCardProps) {
                                         disabled={createTaskResult.isLoading || editTaskResult.isLoading}
                                         type="submit"
                                     >
-                                        {taskMode === 'CREATE' ? 'Create Task' : 'Edit Task'}
+                                        {taskMode === 'CREATE' ? 'Create Task' : 'Save Changes'}
                                     </Button>
                                 </Stack>
                             </Box>

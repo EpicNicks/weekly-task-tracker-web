@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Box, Card, CircularProgress, Container, IconButton, Stack, Tooltip, Typography } from '@mui/material'
-import { useGetActiveTasksQuery } from '../../../redux/services/apiSlice'
+import { Box, Button, Card, CircularProgress, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Stack, Tooltip, Typography } from '@mui/material'
+import { useDeactivateTaskByIdMutation, useGetActiveTasksQuery } from '../../../redux/services/apiSlice'
 import { AddCircle, Delete, ModeEdit } from '@mui/icons-material'
 import TaskEditCard from './TaskEditCard'
 
@@ -8,6 +8,9 @@ export default function TaskEditor() {
     const { data, error, isLoading } = useGetActiveTasksQuery()
     const [createTaskModalOpen, setCreateTaskModalOpen] = useState(false)
     const [editTaskModalOpen, setEditTaskModalOpen] = useState(false)
+    const [deleteTaskDialogOpen, setDeleteTaskDialogOpen] = useState(false)
+
+    const [patchDeactivateTask,] = useDeactivateTaskByIdMutation()
 
     if (isLoading) {
         return <CircularProgress />
@@ -28,7 +31,7 @@ export default function TaskEditor() {
                                     <Stack direction="column" spacing={4}>
                                         {
                                             taskList.map((task) => (
-                                                <Card 
+                                                <Card
                                                     variant="elevation"
                                                     sx={{
                                                         borderLeft: `10px solid #${task.rgbTaskColor}`
@@ -48,8 +51,7 @@ export default function TaskEditor() {
                                                             <Tooltip title="Delete Task">
                                                                 <IconButton
                                                                     onClick={() => {
-                                                                        // TODO: Open MUI Dialog (are you sure)
-                                                                        // if yes, call endpoint to set Task inactive
+                                                                        setDeleteTaskDialogOpen(true)
                                                                     }}
                                                                 >
                                                                     <Delete />
@@ -61,6 +63,27 @@ export default function TaskEditor() {
                                                             setCreateTaskModalOpen={setEditTaskModalOpen}
                                                             initialValues={task}
                                                         />
+                                                        <Dialog open={deleteTaskDialogOpen} onClose={() => setDeleteTaskDialogOpen(false)}>
+                                                            <DialogTitle>Delete this Task?</DialogTitle>
+                                                            <DialogContent>
+                                                                <DialogContentText>
+                                                                    This action may not be reversible
+                                                                </DialogContentText>
+                                                                <DialogActions>
+                                                                    <Button onClick={() => {
+                                                                        setDeleteTaskDialogOpen(false)
+                                                                    }}>
+                                                                        Disagree
+                                                                    </Button>
+                                                                    <Button onClick={() => {
+                                                                        patchDeactivateTask(task.id)
+                                                                        setDeleteTaskDialogOpen(false)
+                                                                    }}>
+                                                                        Agree
+                                                                    </Button>
+                                                                </DialogActions>
+                                                            </DialogContent>
+                                                        </Dialog>
                                                     </Stack>
                                                 </Card>
                                             ))

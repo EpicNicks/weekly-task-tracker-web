@@ -16,7 +16,7 @@ export default function TodayView() {
     if (!data || !data.success || error) {
         return <>Loading...</>
     }
-    if (data.value.length === 0){
+    if (data.value.length === 0) {
         // task list empty add a task behaviour
         // give a tutorial that redirects the user to task-list in tutorial mode or something
     }
@@ -32,7 +32,9 @@ export default function TodayView() {
                                 match(taskList.length)
                                     .with(0, () => (
                                         <Stack direction="column" alignItems="center" pt={8} spacing={4}>
-                                            <Typography>It would appear you have no tasks</Typography>
+                                            <Typography>
+                                                It would appear you have no tasks
+                                            </Typography>
                                             <Button
                                                 variant="contained"
                                                 onClick={() => navigate('/task-tracker/task-editor')}

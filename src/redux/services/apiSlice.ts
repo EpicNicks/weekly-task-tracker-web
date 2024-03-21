@@ -48,6 +48,10 @@ export const weeklyTaskTrackerApi = createApi({
             query: () => '/tasks/active',
             providesTags: ['Tasks']
         }),
+        getTaskByName: builder.query<Result<Task>, string>({
+            query: (taskName) => `/tasks?taskName=${taskName}`,
+            providesTags: ['Tasks'],
+        }),
         getTaskById: builder.query<Result<Task>, number>({
             query: (id) => `/tasks/${id}`,
             providesTags: ['Tasks']
@@ -62,16 +66,27 @@ export const weeklyTaskTrackerApi = createApi({
         }),
         updateTask: builder.mutation<Result<Task>, Task>({
             query: (body) => ({
-                url: `/update-task/${body.id}`,
+                url: `/tasks/update-task/${body.id}`,
                 body,
                 method: 'PATCH',
             }),
             invalidatesTags: ['Tasks']
         }),
+        deactivateTaskById: builder.mutation<Result<Task>, Task['id']>({
+            query: (taskId) => ({
+                url: `/tasks/deactivate/${taskId}`,
+                method: 'PATCH'
+            }),
+            invalidatesTags: ['Tasks']
+        }),
 
         //daily log routes
-        getLogsForDate: builder.query<Result<DailyLog[]>, Date>({
-            query: (date) => `/logs/${DateFormat(date)}`,
+        getAllLogsInRange: builder.query<Result<DailyLog[]>, { startDate: string, endDate: string }>({
+            query: ({ startDate, endDate }) => `/logs/all?startDate=${startDate}&endDate=${endDate}`,
+            providesTags: ['Logs'],
+        }),
+        getLogsForDate: builder.query<Result<DailyLog>, { logDate: Date, taskId: Task['id'] }>({
+            query: ({ logDate, taskId }) => `/logs/${logDate}/${taskId}`,
             providesTags: ['Logs']
         }),
         createLog: builder.mutation<Result<DailyLog>, { logDate: Date, dailyTimeMinutes: number, taskId: number }>({
@@ -111,9 +126,13 @@ export const {
     useGetAllTasksQuery,
     useGetActiveTasksQuery,
     useGetTaskByIdQuery,
+    useGetTaskByNameQuery,
+    useLazyGetTaskByNameQuery,
     useCreateNewTaskMutation,
     useUpdateTaskMutation,
+    useDeactivateTaskByIdMutation,
     // daily logs
+    useGetAllLogsInRangeQuery,
     useGetLogsForDateQuery,
     useCreateLogMutation,
     useUpdateLogMinutesMutation,

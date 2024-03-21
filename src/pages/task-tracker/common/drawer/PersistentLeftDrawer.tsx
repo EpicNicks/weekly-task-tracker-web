@@ -14,6 +14,7 @@ import { Container, Divider, List, ListItemButton, Stack } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { P, match } from 'ts-pattern'
 import DailyViewAppbar from './DailyViewAppbar'
+import { invalidateToken } from '../../../../redux/services/authSlice'
 
 const drawerWidth = 200
 
@@ -198,6 +199,24 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
                     >
                         <Typography textAlign="center" width="100%">
                             Account Management
+                        </Typography>
+                    </ListItemButton>
+                    <ListItemButton
+                        sx={{
+                            backgroundColor: 'pink',
+                            '&:hover': {
+                                backgroundColor: 'red',
+                                color: 'white'
+                            }
+                        }}
+                        selected={currentView === 'account'}
+                        onClick={() => {
+                            navigate('/home')
+                            invalidateToken()
+                        }}
+                    >
+                        <Typography textAlign="center" width="100%">
+                            Logout
                         </Typography>
                     </ListItemButton>
                 </List>

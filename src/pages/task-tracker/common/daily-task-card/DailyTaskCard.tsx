@@ -2,7 +2,8 @@ import { Card, CircularProgress, Divider, Grid, Stack, Typography } from '@mui/m
 import { UserPrefs } from '../../../../redux/services/userPrefs'
 import { match } from 'ts-pattern'
 import TaskLogButton from './TaskLogButton'
-import { useGetLogsForDateQuery } from '../../../../redux/services/apiSlice'
+import { useGetAllLogsInRangeQuery } from '../../../../redux/services/apiSlice'
+import { DateFormat } from '../../../../common/DateFunctions'
 
 export interface DailyTaskCardProps {
     taskId: number
@@ -16,7 +17,7 @@ export default function DailyTaskCard(props: DailyTaskCardProps) {
         taskId,
         taskName,
         taskColor,
-        cardStyle
+        cardStyle,
     } = props
 
     function timeString(minutesLogged: number) {
@@ -28,10 +29,11 @@ export default function DailyTaskCard(props: DailyTaskCardProps) {
             .exhaustive()
     }
 
-    const { data, error, isLoading } = useGetLogsForDateQuery(new Date())
+    const { data, error, isLoading } = useGetAllLogsInRangeQuery({ startDate: DateFormat(new Date()), endDate: DateFormat(new Date()) })
 
+    console.log(data, !!data, !!error, data && !data.success)
     if (!data || error || !data.success) {
-        return <></>
+        return <>dsadas</>
     }
     if (isLoading) {
         return <CircularProgress />

@@ -98,16 +98,16 @@ export default function TaskLogButton(props: TaskLogButtonProps) {
                             hours: Math.floor(initialMinutesLogged / 60).toString(),
                             minutes: Math.floor(initialMinutesLogged % 60).toString(),
                         }}
-                        onSubmit={({ hours, minutes}) => {
+                        onSubmit={({ hours, minutes }) => {
                             // TODO submit
                             if (!hours && !minutes) {
                                 // don't bother updating the time
-
+                                setModalOpen(false)
                                 return
                             }
                             if ((Number(hours) * 60 + Number(minutes)) === initialMinutesLogged) {
                                 // numbers weren't updated
-
+                                setModalOpen(false)
                                 return
                             }
                             if (logButtonType === 'CREATE') {
@@ -115,6 +115,8 @@ export default function TaskLogButton(props: TaskLogButtonProps) {
                                     logDate: new Date(),
                                     dailyTimeMinutes: Number(hours) * 60 + Number(minutes),
                                     taskId: taskProps.taskId,
+                                }).unwrap().then(() => {
+                                    setModalOpen(false)
                                 })
                             }
                             else if (logButtonType === 'UPDATE') {
@@ -122,6 +124,8 @@ export default function TaskLogButton(props: TaskLogButtonProps) {
                                     date: new Date(),
                                     dailyTimeMinutes: Number(hours) * 60 + Number(minutes),
                                     taskId: taskProps.taskId,
+                                }).unwrap().then(() => {
+                                    setModalOpen(false)
                                 })
                             }
                         }}
