@@ -1,7 +1,7 @@
 import { Box, Button, Card, CircularProgress, Container, Stack, Typography } from '@mui/material'
 import DailyTaskCard from '../common/daily-task-card/DailyTaskCard'
 import { useAppSelector } from '../../../redux/hooks'
-import { useGetAllTasksQuery } from '../../../redux/services/apiSlice'
+import { useGetActiveTasksQuery } from '../../../redux/services/apiSlice'
 import { match } from 'ts-pattern'
 import { useNavigate } from 'react-router-dom'
 
@@ -9,7 +9,7 @@ export default function TodayView() {
     const navigate = useNavigate()
     const cardStyle = useAppSelector(state => state.userPrefs.taskDisplayMode)
 
-    const { data, error, isFetching } = useGetAllTasksQuery()
+    const { data, error, isFetching } = useGetActiveTasksQuery()
     if (isFetching) {
         return <CircularProgress />
     }
