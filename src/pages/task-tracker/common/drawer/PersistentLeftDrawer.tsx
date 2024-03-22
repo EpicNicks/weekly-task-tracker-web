@@ -22,7 +22,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
     open?: boolean
 }>(({ theme, open }) => ({
     flexGrow: 1,
-    padding: theme.spacing(3),
+    padding: theme.spacing(0),
     transition: theme.transitions.create('margin', {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
@@ -155,7 +155,10 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
                 <List>
                     <ListItemButton
                         selected={false}
-                        onClick={() => navigate('/home')}
+                        onClick={() => {
+                            handleDrawerClose()
+                            navigate('/home')
+                        }}
                     >
                         <Typography textAlign="center" width="100%">
                             Home
@@ -164,6 +167,7 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
                     <ListItemButton
                         selected={currentView === 'today-view'}
                         onClick={() => {
+                            handleDrawerClose()
                             navigate('/task-tracker/today-view')
                         }}
                     >
@@ -174,6 +178,7 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
                     <ListItemButton
                         selected={currentView === 'weekly-view'}
                         onClick={() => {
+                            handleDrawerClose()
                             navigate('/task-tracker/weekly-view')
                         }}
                     >
@@ -184,6 +189,7 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
                     <ListItemButton
                         selected={currentView === 'task-editor'}
                         onClick={() => {
+                            handleDrawerClose()
                             navigate('/task-tracker/task-editor')
                         }}
                     >
@@ -194,6 +200,7 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
                     <ListItemButton
                         selected={currentView === 'account'}
                         onClick={() => {
+                            handleDrawerClose()
                             navigate('/task-tracker/account')
                         }}
                     >
