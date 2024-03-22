@@ -2,7 +2,7 @@ import { Card, CircularProgress, Divider, Grid, Stack, Typography } from '@mui/m
 import { UserPrefs } from '../../../../redux/services/userPrefs'
 import { match } from 'ts-pattern'
 import TaskLogButton from './TaskLogButton'
-import { useGetAllLogsInRangeQuery } from '../../../../redux/services/apiSlice'
+import { useGetLogsForDateQuery } from '../../../../redux/services/apiSlice'
 import { DateFormat } from '../../../../common/DateFunctions'
 
 export interface DailyTaskCardProps {
@@ -29,18 +29,25 @@ export default function DailyTaskCard(props: DailyTaskCardProps) {
             .exhaustive()
     }
 
-    const { data, error, isLoading } = useGetAllLogsInRangeQuery({ startDate: DateFormat(new Date()), endDate: DateFormat(new Date()) })
+    const { data, error, isLoading } = useGetLogsForDateQuery({ logDate: DateFormat(new Date()), taskId })
 
-    console.log(data, !!data, !!error, data && !data.success)
-    if (!data || error || !data.success) {
-        return <>dsadas</>
-    }
     if (isLoading) {
         return <CircularProgress />
     }
-    const dailyLogList = data.value
 
-    const log = dailyLogList.find(log => log.taskId === taskId)
+    const log = data && data.success
+        ? data.value
+        : undefined
+
+    if (!data || !data.success) {
+        if (error && 'status' in error && error.status === 404){
+            // log is undefined, create new 
+        } else {
+            return <Typography>An Unexpected Error Has Occurred</Typography>
+        }
+    }
+
+    console.log(log)
     const minutesLogged = log?.dailyTimeMinutes ?? 0
     const logButtonType = match(log)
         .with(undefined, () => ('CREATE' as const))

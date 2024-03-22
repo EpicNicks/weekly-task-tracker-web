@@ -89,7 +89,7 @@ export const weeklyTaskTrackerApi = createApi({
             query: ({ startDate, endDate }) => `/logs/all?startDate=${startDate}&endDate=${endDate}`,
             providesTags: ['Logs'],
         }),
-        getLogsForDate: builder.query<Result<DailyLog>, { logDate: Date, taskId: Task['id'] }>({
+        getLogsForDate: builder.query<Result<DailyLog>, { logDate: string, taskId: Task['id'] }>({
             query: ({ logDate, taskId }) => `/logs/${logDate}/${taskId}`,
             providesTags: ['Logs']
         }),
