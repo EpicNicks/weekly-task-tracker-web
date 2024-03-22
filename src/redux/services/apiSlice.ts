@@ -56,6 +56,10 @@ export const weeklyTaskTrackerApi = createApi({
             query: (id) => `/tasks/${id}`,
             providesTags: ['Tasks']
         }),
+        getTaskProgress: builder.query<Result<number>, number>({
+            query: (taskId) => `/tasks/total-progress/${taskId}`,
+            providesTags: ['Tasks']
+        }),
         createNewTask: builder.mutation<Result<Task>, { taskName: Task['taskName'], rgbTaskColor: Task['rgbTaskColor'], weeklyTargetMinutes: Task['weeklyTargetMinutes'] }>({
             query: (body) => ({
                 url: '/tasks/create',
@@ -127,6 +131,7 @@ export const {
     useGetActiveTasksQuery,
     useGetTaskByIdQuery,
     useGetTaskByNameQuery,
+    useGetTaskProgressQuery,
     useLazyGetTaskByNameQuery,
     useCreateNewTaskMutation,
     useUpdateTaskMutation,
