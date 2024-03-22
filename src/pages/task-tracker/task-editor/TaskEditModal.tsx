@@ -33,6 +33,7 @@ export default function TaskEditModal(props: TaskEditModalProps) {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
+        maxWidth: '90%',
         width: 600,
         bgcolor: 'background.paper',
         border: '2px solid #000',
@@ -50,7 +51,7 @@ export default function TaskEditModal(props: TaskEditModalProps) {
                     goalLength: 'weekly' as 'weekly' | 'daily' | 'monthly',
                     minuteHour: 'hour' as 'minute' | 'hour',
                 }}
-                onSubmit={({ taskName, rgbTaskColor, target, goalLength, minuteHour }) => {
+                onSubmit={({ taskName, rgbTaskColor, target, goalLength, minuteHour }, formikBag) => {
                     const sanitizedTaskColor = rgbTaskColor.substring(1).toUpperCase().padEnd(8, 'F')
                     const weeklyTargetMinutes = (target ?? 0) * match(goalLength)
                         .with('daily', () => 7)
@@ -60,29 +61,67 @@ export default function TaskEditModal(props: TaskEditModalProps) {
                             .with('minute', () => 1)
                             .with('hour', () => 60)
                             .exhaustive()
-                    if (taskMode === 'CREATE') {
-                        postCreateTask({ taskName, rgbTaskColor: sanitizedTaskColor, weeklyTargetMinutes }).unwrap()
-                            .then((res) => {
-                                if (res.success) {
-                                    setCreateTaskModalOpen(false)
+                    getTaskByName(taskName).unwrap()
+                        .then((res) => {
+                            if (!res.success) {
+                                if (taskMode === 'CREATE') {
+                                    postCreateTask({ taskName, rgbTaskColor: sanitizedTaskColor, weeklyTargetMinutes }).unwrap()
+                                        .then((res) => {
+                                            if (res.success) {
+                                                setCreateTaskModalOpen(false)
+                                            }
+                                        })
                                 }
-                            })
-                    }
-                    else {
-                        patchEditTask({
-                            id: initialValues!.id,
-                            taskName,
-                            rgbTaskColor: sanitizedTaskColor,
-                            weeklyTargetMinutes,
-                            isActive: initialValues!.isActive,
-                            userId: initialValues!.userId
-                        }).unwrap()
-                            .then((res) => {
-                                if (res.success) {
-                                    setCreateTaskModalOpen(false)
+                                else {
+                                    patchEditTask({
+                                        id: initialValues!.id,
+                                        taskName,
+                                        rgbTaskColor: sanitizedTaskColor,
+                                        weeklyTargetMinutes,
+                                        isActive: initialValues!.isActive,
+                                        userId: initialValues!.userId
+                                    }).unwrap()
+                                        .then((res) => {
+                                            if (res.success) {
+                                                setCreateTaskModalOpen(false)
+                                            }
+                                        })
                                 }
-                            })
-                    }
+                            }
+                            else {
+                                formikBag.setFieldError('taskName', 'You already have a task with that name')
+                            }
+                        }).catch((error) => {
+                            if (error && 'status' in error && error.status === 404) {
+                                if (taskMode === 'CREATE') {
+                                    postCreateTask({ taskName, rgbTaskColor: sanitizedTaskColor, weeklyTargetMinutes }).unwrap()
+                                        .then((res) => {
+                                            if (res.success) {
+                                                setCreateTaskModalOpen(false)
+                                            }
+                                        })
+                                }
+                                else {
+                                    patchEditTask({
+                                        id: initialValues!.id,
+                                        taskName,
+                                        rgbTaskColor: sanitizedTaskColor,
+                                        weeklyTargetMinutes,
+                                        isActive: initialValues!.isActive,
+                                        userId: initialValues!.userId
+                                    }).unwrap()
+                                        .then((res) => {
+                                            if (res.success) {
+                                                setCreateTaskModalOpen(false)
+                                            }
+                                        })
+                                }
+                            }
+                            else {
+                                formikBag.setFieldError('taskName', 'An Unexpected Error Has Occurred')
+                            }
+                        })
+
                 }}
                 validationSchema={
                     Yup.object().shape({
@@ -139,86 +178,90 @@ export default function TaskEditModal(props: TaskEditModalProps) {
                                         />
                                         <GenericErrorText formik={formikProps} fieldName="rgbTaskColor" />
                                     </Stack>
-                                    <Grid container direction="row" alignItems="center" pl={2}>
-                                        <Grid item xs={2}>
-                                            <Typography>
-                                                I want to do
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={1.25}>
-                                            <NumericField
-                                                name="target"
-                                                value={formikProps.values.target}
-                                                onChange={formikProps.handleChange}
-                                                onBlur={formikProps.handleBlur}
-                                                numericmode="decimal"
-                                                max={
-                                                    match(formikProps.values.goalLength)
-                                                        .with('daily', () => 24 * 60)
-                                                        .with('weekly', () => 24 * 7 * 60)
-                                                        .with('monthly', () => 24 * 31 * 60)
-                                                        .exhaustive()
-                                                }
-                                                size="small"
-                                                inputProps={{
-                                                    style: { textAlign: 'center' }
-                                                }}
-                                                disabled={createTaskResult.isLoading || editTaskResult.isLoading}
-                                            />
-                                            <GenericErrorText formik={formikProps} fieldName="target" />
-                                        </Grid>
-                                        <Grid item xs={2.75}>
-                                            <FormControl fullWidth>
-                                                <InputLabel id="minute-hour-select"></InputLabel>
-                                                <Select
-                                                    labelId="minute-hour-select"
-                                                    name="minuteHour"
-                                                    value={formikProps.values.minuteHour}
-                                                    label=""
-                                                    onChange={(e) => {
-                                                        if (e.target.value === 'hour') {
-                                                            formikProps.setFieldValue('target', formikProps.values.target / 60)
-                                                        }
-                                                        if (e.target.value === 'minute') {
-                                                            formikProps.setFieldValue('target', formikProps.values.target * 60)
-                                                        }
-                                                        formikProps.handleChange(e)
-                                                    }}
-                                                    onBlur={formikProps.handleBlur}
-                                                    size="small"
-                                                    disabled={createTaskResult.isLoading || editTaskResult.isLoading}
-                                                >
-                                                    <MenuItem value="minute">minutes</MenuItem>
-                                                    <MenuItem value="hour">hours</MenuItem>
-                                                </Select>
-                                                <GenericErrorText formik={formikProps} fieldName="goalLength" />
-                                            </FormControl>
-                                            <GenericErrorText formik={formikProps} fieldName="minuteHour" />
-                                        </Grid>
-                                        <Grid item xs={formikProps.values.taskName?.length > 0 ? Math.min(Math.max(formikProps.values.taskName?.length / 3, 2), 3) : 2}>
-                                            <Typography>
-                                                of {formikProps.values.taskName || '______'}
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <FormControl fullWidth>
-                                                <InputLabel id="goal-length-select">Goal Length</InputLabel>
-                                                <Select
-                                                    labelId="goal-length-select"
-                                                    name="goalLength"
-                                                    value={formikProps.values.goalLength}
-                                                    label="Goal Length"
+                                    <Grid container alignItems="center" pl={2}>
+                                        <Grid container alignItems="center" pb={2}>
+                                            <Grid item xs={4}>
+                                                <Typography>
+                                                    I want to do
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                <NumericField
+                                                    name="target"
+                                                    value={formikProps.values.target}
                                                     onChange={formikProps.handleChange}
                                                     onBlur={formikProps.handleBlur}
+                                                    numericmode="decimal"
+                                                    max={
+                                                        match(formikProps.values.goalLength)
+                                                            .with('daily', () => 24 * 60)
+                                                            .with('weekly', () => 24 * 7 * 60)
+                                                            .with('monthly', () => 24 * 31 * 60)
+                                                            .exhaustive()
+                                                    }
                                                     size="small"
+                                                    inputProps={{
+                                                        style: { textAlign: 'center' }
+                                                    }}
                                                     disabled={createTaskResult.isLoading || editTaskResult.isLoading}
-                                                >
-                                                    <MenuItem value="daily">Daily</MenuItem>
-                                                    <MenuItem value="weekly">Weekly</MenuItem>
-                                                    <MenuItem value="monthly">Monthly</MenuItem>
-                                                </Select>
-                                            </FormControl>
-                                            <GenericErrorText formik={formikProps} fieldName="goalLength" />
+                                                />
+                                                <GenericErrorText formik={formikProps} fieldName="target" />
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                <FormControl fullWidth>
+                                                    <InputLabel id="minute-hour-select"></InputLabel>
+                                                    <Select
+                                                        labelId="minute-hour-select"
+                                                        name="minuteHour"
+                                                        value={formikProps.values.minuteHour}
+                                                        label=""
+                                                        onChange={(e) => {
+                                                            if (e.target.value === 'hour') {
+                                                                formikProps.setFieldValue('target', formikProps.values.target / 60)
+                                                            }
+                                                            if (e.target.value === 'minute') {
+                                                                formikProps.setFieldValue('target', formikProps.values.target * 60)
+                                                            }
+                                                            formikProps.handleChange(e)
+                                                        }}
+                                                        onBlur={formikProps.handleBlur}
+                                                        size="small"
+                                                        disabled={createTaskResult.isLoading || editTaskResult.isLoading}
+                                                    >
+                                                        <MenuItem value="minute">minutes</MenuItem>
+                                                        <MenuItem value="hour">hours</MenuItem>
+                                                    </Select>
+                                                    <GenericErrorText formik={formikProps} fieldName="goalLength" />
+                                                </FormControl>
+                                                <GenericErrorText formik={formikProps} fieldName="minuteHour" />
+                                            </Grid>
+                                        </Grid>
+                                        <Grid container alignItems="center">
+                                            <Grid item xs={formikProps.values.taskName?.length > 0 ? Math.min(Math.max(formikProps.values.taskName?.length / 2, 6), 6) : 2}>
+                                                <Typography>
+                                                    of {formikProps.values.taskName || '______'}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={6}>
+                                                <FormControl fullWidth>
+                                                    <InputLabel id="goal-length-select">Goal Length</InputLabel>
+                                                    <Select
+                                                        labelId="goal-length-select"
+                                                        name="goalLength"
+                                                        value={formikProps.values.goalLength}
+                                                        label="Goal Length"
+                                                        onChange={formikProps.handleChange}
+                                                        onBlur={formikProps.handleBlur}
+                                                        size="small"
+                                                        disabled={createTaskResult.isLoading || editTaskResult.isLoading}
+                                                    >
+                                                        <MenuItem value="daily">Daily</MenuItem>
+                                                        <MenuItem value="weekly">Weekly</MenuItem>
+                                                        <MenuItem value="monthly">Monthly</MenuItem>
+                                                    </Select>
+                                                </FormControl>
+                                                <GenericErrorText formik={formikProps} fieldName="goalLength" />
+                                            </Grid>
                                         </Grid>
                                     </Grid>
                                     <Button

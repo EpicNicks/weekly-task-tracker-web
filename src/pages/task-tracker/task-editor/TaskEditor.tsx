@@ -24,7 +24,7 @@ export default function TaskEditor() {
                     <Container maxWidth="md">
                         <Box mt={2} mb={4}>
                             <Box alignItems="center">
-                                <Container maxWidth="sm">
+                                <Container maxWidth="md">
                                     <Stack direction="column" spacing={4}>
                                         {
                                             taskList.map((task) => (
