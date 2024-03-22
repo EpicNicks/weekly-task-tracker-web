@@ -58,25 +58,25 @@ export default function DailyLogCard(props: DailyLogCardProps) {
             {
                 match(cardStyle)
                     .with('cozy', () => (
-                        <Grid container direction="row" m={4} mr={0} alignItems="center">
-                            <Grid item xs={10}>
+                        <Grid container m={4} mr={0} alignItems="center">
+                            <Grid item md={10} xs={12}>
                                 <Stack direction="column" spacing={1}>
-                                    <Typography variant="h3">{taskName}</Typography>
+                                    <Typography variant="h4">{taskName}</Typography>
                                     <Divider color={taskColor.substring(0, 6)} />
-                                    <Typography pt={2} variant="h5">Time spent today: {timeString(minutesLogged)}</Typography>
+                                    <Typography pt={2} variant="h6">Time spent today: {timeString(minutesLogged)}</Typography>
                                 </Stack>
                             </Grid>
-                            <Grid item ml={1} xs={1}>
+                            <Grid item ml={1} md={1} xs={12}>
                                 <TaskLogButton logButtonType={logButtonType} taskProps={{ taskId, minutesLogged, taskName: taskName }} />
                             </Grid>
                         </Grid>
                     ))
                     .with('compact', () => (
-                        <Grid direction="row" container m={2} mt={0} spacing={2} alignItems="center">
-                            <Grid item xs={8}>
+                        <Grid container m={2} mt={0} spacing={0} pt={1} alignItems="center" justifyContent="space-evenly">
+                            <Grid item md={9} sm={8} xs={12}>
                                 <Typography variant="h4">{taskName}</Typography>
                             </Grid>
-                            <Grid item xs={4}>
+                            <Grid item md={3} sm={4} xs={12}>
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <Typography variant="h4">{timeString(minutesLogged)}</Typography>
                                     <TaskLogButton logButtonType={logButtonType} taskProps={{ taskId, minutesLogged, taskName: taskName }} />
