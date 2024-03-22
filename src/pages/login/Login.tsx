@@ -51,7 +51,7 @@ function Login() {
     const token = getUserToken()
 
     if (token) {
-        return <Navigate to="task-tracker" replace />
+        return <Navigate to="/task-tracker" replace />
     }
     return (
         <>
