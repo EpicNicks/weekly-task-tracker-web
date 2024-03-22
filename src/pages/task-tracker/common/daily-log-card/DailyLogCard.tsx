@@ -3,16 +3,16 @@ import { UserPrefs } from '../../../../redux/services/userPrefs'
 import { match } from 'ts-pattern'
 import TaskLogButton from './TaskLogButton'
 import { useGetLogsForDateQuery } from '../../../../redux/services/apiSlice'
-import { DateFormat } from '../../../../common/DateFunctions'
+import { dateFormat } from '../../../../common/DateFunctions'
 
-export interface DailyTaskCardProps {
+export interface DailyLogCardProps {
     taskId: number
     taskName: string
     taskColor: string
     cardStyle: UserPrefs['taskDisplayMode']
 }
 
-export default function DailyTaskCard(props: DailyTaskCardProps) {
+export default function DailyLogCard(props: DailyLogCardProps) {
     const {
         taskId,
         taskName,
@@ -29,7 +29,7 @@ export default function DailyTaskCard(props: DailyTaskCardProps) {
             .exhaustive()
     }
 
-    const { data, error, isLoading } = useGetLogsForDateQuery({ logDate: DateFormat(new Date()), taskId })
+    const { data, error, isLoading } = useGetLogsForDateQuery({ logDate: dateFormat(new Date()), taskId })
 
     if (isLoading) {
         return <CircularProgress />

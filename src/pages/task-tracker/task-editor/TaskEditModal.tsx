@@ -6,7 +6,7 @@ import * as Yup from 'yup'
 import { randomRgbColor } from '../../../common/RandomFunctions'
 import { useCreateNewTaskMutation, useLazyGetTaskByNameQuery, useUpdateTaskMutation } from '../../../redux/services/apiSlice'
 import GenericErrorText from '../common/GenericErrorText'
-import NumericField from '../common/daily-task-card/NumericField'
+import NumericField from '../common/daily-log-card/NumericField'
 import { Task } from '../../../redux/responseTypes/Task'
 
 interface TaskEditModalProps {

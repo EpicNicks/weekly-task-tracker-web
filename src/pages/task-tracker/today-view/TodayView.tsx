@@ -1,5 +1,5 @@
 import { Box, Button, Card, CircularProgress, Container, Stack, Typography } from '@mui/material'
-import DailyTaskCard from '../common/daily-task-card/DailyTaskCard'
+import DailyLogCard from '../common/daily-log-card/DailyLogCard'
 import { useAppSelector } from '../../../redux/hooks'
 import { useGetActiveTasksQuery } from '../../../redux/services/apiSlice'
 import { match } from 'ts-pattern'
@@ -47,7 +47,7 @@ export default function TodayView() {
                                         <Stack spacing={4}>
                                             {
                                                 taskList.map((task) => (
-                                                    <DailyTaskCard
+                                                    <DailyLogCard
                                                         taskId={task.id}
                                                         taskName={task.taskName}
                                                         taskColor={`#${task.rgbTaskColor}`}

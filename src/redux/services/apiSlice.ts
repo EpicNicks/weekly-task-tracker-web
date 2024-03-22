@@ -4,7 +4,7 @@ import { User } from '../responseTypes/User'
 import { Task } from '../responseTypes/Task'
 import { getUserToken } from './authSlice'
 import { DailyLog } from '../responseTypes/DailyLog'
-import { DateFormat } from '../../common/DateFunctions'
+import { dateFormat } from '../../common/DateFunctions'
 
 export const weeklyTaskTrackerApi = createApi({
     reducerPath: 'weeklyTaskTrackerApi',
@@ -97,7 +97,7 @@ export const weeklyTaskTrackerApi = createApi({
             query: (body) => ({
                 url: `/logs/create`,
                 body: {
-                    logDate: DateFormat(body.logDate),
+                    logDate: dateFormat(body.logDate),
                     dailyTimeMinutes: body.dailyTimeMinutes,
                     taskId: body.taskId,
                 },
@@ -107,7 +107,7 @@ export const weeklyTaskTrackerApi = createApi({
         }),
         updateLogMinutes: builder.mutation<Result<DailyLog>, { date: Date, dailyTimeMinutes: number, taskId: number }>({
             query: (body) => ({
-                url: `/logs/change-daily-minutes/${DateFormat(body.date)}`,
+                url: `/logs/change-daily-minutes/${dateFormat(body.date)}`,
                 body: {
                     dailyTimeMinutes: body.dailyTimeMinutes,
                     taskId: body.taskId,
