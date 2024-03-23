@@ -8,5 +8,9 @@ export default defineConfig({
     proxy: {
       '/api': 'http://192.168.2.70:8080'
     }
-  }
+  },
+  // optimizeDeps: {
+  //   include: ['@mui/material/CssBaseline', '@mui/material/Box'],
+  //   force: true
+  // },
 })

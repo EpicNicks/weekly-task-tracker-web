@@ -1,26 +1,28 @@
 import { AddCircle } from '@mui/icons-material'
-import { Tooltip, IconButton, Modal, Box, Typography, Grid, Button, Stack } from '@mui/material'
+import { Tooltip, IconButton, Modal, Box, Typography, Grid, Button, Stack, FormControl, InputLabel, Select, MenuItem, CircularProgress } from '@mui/material'
 import { useEffect, useState } from 'react'
 import NumericField from './NumericField'
 import { Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import { match } from 'ts-pattern'
-import { useCreateLogMutation, useUpdateLogMinutesMutation } from '../../../../redux/services/apiSlice'
+import { useCreateLogMutation, useLazyGetActiveTasksQuery, useUpdateLogMinutesMutation } from '../../../../redux/services/apiSlice'
+import GenericErrorText from '../GenericErrorText'
 
 interface TaskLogButtonProps {
-    addCircleProps?: typeof AddCircle
-    taskProps: {
-        taskId: number,
-        taskName: string
-        minutesLogged: number
-    },
+    addCircleProps?: React.ComponentProps<typeof AddCircle>
+    taskProps?: {
+        taskId?: number
+        taskName?: string
+        minutesLogged?: number
+        logDate?: string
+    }
     logButtonType: 'CREATE' | 'UPDATE'
 }
 
 export default function TaskLogButton(props: TaskLogButtonProps) {
     const {
         addCircleProps = {},
-        taskProps,
+        taskProps = {},
         logButtonType,
     } = props
 
@@ -29,8 +31,9 @@ export default function TaskLogButton(props: TaskLogButtonProps) {
     const [isStopwatchPaused, setIsStopwatchPaused] = useState(false)
     const [time, setTime] = useState(0)
 
-    const [postCreateLog,] = useCreateLogMutation()
-    const [patchUpdateLogMinutes,] = useUpdateLogMinutesMutation()
+    const [getActiveTasks, activeTasksResult] = useLazyGetActiveTasksQuery()
+    const [postCreateLog, createResult] = useCreateLogMutation()
+    const [patchUpdateLogMinutes, updateResult] = useUpdateLogMinutesMutation()
 
     useEffect(() => {
         let interval: number | undefined = undefined
@@ -62,14 +65,17 @@ export default function TaskLogButton(props: TaskLogButtonProps) {
         setTime(0)
     }
 
-    const initialMinutesLogged = taskProps.minutesLogged
+    const initialMinutesLogged = taskProps.minutesLogged ?? 0
+    if (!taskProps.taskId && !activeTasksResult.data && !activeTasksResult.isLoading) {
+        getActiveTasks(undefined, true)
+    }
 
     const modalStyles = {
         position: 'absolute' as const,
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        maxWidth: '90%',
+        maxWidth: '80vw',
         width: 600,
         bgcolor: 'background.paper',
         border: '2px solid #000',
@@ -96,10 +102,11 @@ export default function TaskLogButton(props: TaskLogButtonProps) {
                 <Box sx={modalStyles} m={0}>
                     <Formik
                         initialValues={{
+                            taskId: taskProps.taskId,
                             hours: Math.floor(initialMinutesLogged / 60).toString(),
                             minutes: Math.floor(initialMinutesLogged % 60).toString(),
                         }}
-                        onSubmit={({ hours, minutes }) => {
+                        onSubmit={({ taskId, hours, minutes }) => {
                             // TODO submit
                             if (!hours && !minutes) {
                                 // don't bother updating the time
@@ -115,16 +122,16 @@ export default function TaskLogButton(props: TaskLogButtonProps) {
                                 postCreateLog({
                                     logDate: new Date(),
                                     dailyTimeMinutes: Number(hours) * 60 + Number(minutes),
-                                    taskId: taskProps.taskId,
+                                    taskId: taskProps.taskId ?? taskId!,
                                 }).unwrap().then(() => {
                                     setModalOpen(false)
                                 })
                             }
                             else if (logButtonType === 'UPDATE') {
                                 patchUpdateLogMinutes({
-                                    date: new Date(),
+                                    date: taskProps.logDate!,
                                     dailyTimeMinutes: Number(hours) * 60 + Number(minutes),
-                                    taskId: taskProps.taskId,
+                                    taskId: taskProps.taskId ?? taskId!,
                                 }).unwrap().then(() => {
                                     setModalOpen(false)
                                 })
@@ -133,6 +140,9 @@ export default function TaskLogButton(props: TaskLogButtonProps) {
                         validationSchema={Yup.object({
                             hours: Yup.string().nullable(),
                             minutes: Yup.string().nullable(),
+                            taskId: taskProps.taskId
+                                ? Yup.number().nullable()
+                                : Yup.number().required('You must select a Task')
                         })}
                     >
                         {
@@ -140,10 +150,51 @@ export default function TaskLogButton(props: TaskLogButtonProps) {
                                 <Form>
                                     <Grid container direction="column">
                                         <Grid item xs={12}>
-                                            <Typography variant="h4" pb={2}>
-                                                {taskProps.taskName}
-                                            </Typography>
+                                            {
+                                                taskProps.taskId ? (
+                                                    <Typography variant="h4" pb={2}>
+                                                        {taskProps.taskName}
+                                                    </Typography>
+                                                ) : (
+                                                    (() => {
+                                                        const { currentData, error, isLoading } = activeTasksResult
+                                                        if (isLoading) {
+                                                            return <CircularProgress />
+                                                        }
+                                                        if (!currentData || !currentData.success || error) {
+                                                            console.log(currentData, currentData?.success, error)
+                                                            return <>An Unexpected Error Has Occurred. Please Reload the Page</>
+                                                        }
+                                                        return (
+                                                            <Box pb={2}>
+                                                                <FormControl fullWidth>
+                                                                    <InputLabel id="task-name-select">Task</InputLabel>
+                                                                    <Select
+                                                                        labelId="task-name-select"
+                                                                        name="taskId"
+                                                                        label="Task"
+                                                                        value={formikProps.values.taskId}
+                                                                        onChange={formikProps.handleChange}
+                                                                        onBlur={formikProps.handleBlur}
+                                                                        disabled={createResult.isLoading || updateResult.isLoading}
+                                                                    >
+                                                                        {currentData.value.map((task) => <MenuItem value={task.id}>{task.taskName}</MenuItem>)}
+                                                                    </Select>
+                                                                </FormControl>
+                                                                <GenericErrorText formik={formikProps} fieldName="taskId" />
+                                                            </Box>
+                                                        )
+                                                    })()
+                                                )
+                                            }
                                         </Grid>
+                                        {taskProps.logDate && (
+                                            <Grid item xs={12}>
+                                                <Typography variant="subtitle1" pb={2}>
+                                                    [{taskProps.logDate}]
+                                                </Typography>
+                                            </Grid>
+                                        )}
                                         <Grid item xs={12}>
                                             <Grid container direction="row" spacing={2} alignItems="center">
                                                 <Grid item xs={4}>
@@ -168,6 +219,7 @@ export default function TaskLogButton(props: TaskLogButtonProps) {
                                                         InputProps={{
                                                             endAdornment: <Typography>h</Typography>
                                                         }}
+                                                        disabled={createResult.isLoading || updateResult.isLoading}
                                                     />
                                                 </Grid>
                                                 <Grid item xs={4}>
@@ -201,6 +253,7 @@ export default function TaskLogButton(props: TaskLogButtonProps) {
                                                         InputProps={{
                                                             endAdornment: <Typography>m</Typography>
                                                         }}
+                                                        disabled={createResult.isLoading || updateResult.isLoading}
                                                     />
                                                 </Grid>
                                             </Grid>
@@ -228,25 +281,38 @@ export default function TaskLogButton(props: TaskLogButtonProps) {
                                                                 .with(false, () => (
                                                                     <>
                                                                         {!isStopwatchActive &&
-                                                                            <Button onClick={handleStart}>
+                                                                            <Button
+                                                                                onClick={handleStart}
+                                                                                disabled={createResult.isLoading || updateResult.isLoading}
+                                                                            >
                                                                                 Start
                                                                             </Button>
                                                                         }
-                                                                        <Button onClick={handlePauseResume}>
+                                                                        <Button
+                                                                            onClick={handlePauseResume}
+
+                                                                            disabled={createResult.isLoading || updateResult.isLoading}
+                                                                        >
                                                                             Pause
                                                                         </Button>
                                                                     </>
                                                                 ))
                                                                 .with(true, () => (
                                                                     <>
-                                                                        <Button onClick={handlePauseResume}>
+                                                                        <Button
+                                                                            onClick={handlePauseResume}
+                                                                            disabled={createResult.isLoading || updateResult.isLoading}
+                                                                        >
                                                                             Resume
                                                                         </Button>
-                                                                        <Button onClick={handleReset}>
+                                                                        <Button
+                                                                            onClick={handleReset}
+                                                                            disabled={createResult.isLoading || updateResult.isLoading}
+                                                                        >
                                                                             Reset
                                                                         </Button>
                                                                         <Button
-                                                                            disabled={Math.floor(time / 60_000) <= 0}
+                                                                            disabled={Math.floor(time / 60_000) <= 0 || createResult.isLoading || updateResult.isLoading}
                                                                             onClick={() => {
                                                                                 const hoursToAdd = Math.floor(time / 3_600_000)
                                                                                 const minutesToAdd = Math.floor(time / 60_000)

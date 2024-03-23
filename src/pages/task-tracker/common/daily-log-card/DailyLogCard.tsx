@@ -40,7 +40,7 @@ export default function DailyLogCard(props: DailyLogCardProps) {
         : undefined
 
     if (!data || !data.success) {
-        if (error && 'status' in error && error.status === 404){
+        if (error && 'status' in error && error.status === 404) {
             // log is undefined, create new 
         } else {
             return <Typography>An Unexpected Error Has Occurred</Typography>
@@ -67,7 +67,7 @@ export default function DailyLogCard(props: DailyLogCardProps) {
                                 </Stack>
                             </Grid>
                             <Grid item ml={1} md={1} xs={12}>
-                                <TaskLogButton logButtonType={logButtonType} taskProps={{ taskId, minutesLogged, taskName: taskName }} />
+                                <TaskLogButton logButtonType={logButtonType} taskProps={{ taskId, minutesLogged, logDate: log?.logDate, taskName: taskName }} />
                             </Grid>
                         </Grid>
                     ))
@@ -79,7 +79,7 @@ export default function DailyLogCard(props: DailyLogCardProps) {
                             <Grid item md={3} sm={4} xs={12}>
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <Typography variant="h4">{timeString(minutesLogged)}</Typography>
-                                    <TaskLogButton logButtonType={logButtonType} taskProps={{ taskId, minutesLogged, taskName: taskName }} />
+                                    <TaskLogButton logButtonType={logButtonType} taskProps={{ taskId, minutesLogged, logDate: log?.logDate, taskName: taskName }} />
                                 </Stack>
                             </Grid>
                         </Grid>

@@ -105,7 +105,7 @@ export const weeklyTaskTrackerApi = createApi({
             }),
             invalidatesTags: ['Logs']
         }),
-        updateLogMinutes: builder.mutation<Result<DailyLog>, { date: Date, dailyTimeMinutes: number, taskId: number }>({
+        updateLogMinutes: builder.mutation<Result<DailyLog>, { date: Date | string, dailyTimeMinutes: number, taskId: number }>({
             query: (body) => ({
                 url: `/logs/change-daily-minutes/${dateFormat(body.date)}`,
                 body: {
@@ -129,6 +129,7 @@ export const {
     // tasks
     useGetAllTasksQuery,
     useGetActiveTasksQuery,
+    useLazyGetActiveTasksQuery,
     useGetTaskByIdQuery,
     useGetTaskByNameQuery,
     useGetTaskProgressQuery,
