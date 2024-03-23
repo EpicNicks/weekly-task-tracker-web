@@ -36,7 +36,7 @@ export default function TaskLogButton(props: TaskLogButtonProps) {
     const [patchUpdateLogMinutes, updateResult] = useUpdateLogMinutesMutation()
 
     useEffect(() => {
-        let interval: number | undefined = undefined
+        let interval: ReturnType<typeof setTimeout> | undefined = undefined
 
         if (isStopwatchActive && isStopwatchPaused === false) {
             interval = setInterval(() => {
