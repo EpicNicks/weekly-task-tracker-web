@@ -1,22 +1,29 @@
-import { Box, CircularProgress, Divider, Stack } from '@mui/material'
+import { Box, CircularProgress, Divider, IconButton, Stack } from '@mui/material'
 import { useGetAllLogsInRangeQuery } from '../../../redux/services/apiSlice'
 import { dateFormat } from '../../../common/DateFunctions'
 import { DailyLog } from '../../../redux/responseTypes/DailyLog'
 import DayOfWeek from './DayOfWeek'
 import { WeeklyProgressDisplay } from './WeeklyProgressDisplay'
+import { useState } from 'react'
+import { ArrowLeft, ArrowRight } from '@mui/icons-material'
+
+
+function datesThisWeek(date: Date = new Date()) {
+    // get monday of provided date
+    const newDate = new Date(date)
+    newDate.setDate(newDate.getDate() - newDate.getDay() + 1)
+    const thisWeekDates = []
+    for (let i = 0; i < 7; ++i) {
+        thisWeekDates.push(new Date(newDate))
+        newDate.setDate(newDate.getDate() + 1)
+    }
+    return thisWeekDates
+}
 
 export default function WeeklyView() {
-    function datesThisWeek() {
-        const today = new Date()
-        today.setDate(today.getDate() - today.getDay() + 1)
-        const thisWeekDates = []
-        for (let i = 0; i < 7; ++i) {
-            thisWeekDates.push(new Date(today))
-            today.setDate(today.getDate() + 1)
-        }
-        return thisWeekDates
-    }
-    const thisWeekDates = datesThisWeek()
+    const [baseDate, setBaseDate] = useState(new Date())
+
+    const thisWeekDates = datesThisWeek(baseDate)
     const { data, error, isLoading } = useGetAllLogsInRangeQuery({ startDate: dateFormat(thisWeekDates[0]), endDate: dateFormat(thisWeekDates[thisWeekDates.length - 1]) })
 
     if (isLoading) {
@@ -50,8 +57,38 @@ export default function WeeklyView() {
                     sx={{ backgroundColor: 'white' }}
                 >
                     {
-                        datesThisWeek().map((date) => {
-                            return <DayOfWeek key={dateFormat(date)} date={date} logs={logMap.get(dateFormat(date, '-')) ?? []} />
+                        thisWeekDates.map((date, index) => {
+                            return (
+                                <>
+                                    {index === 0 && (
+                                        <IconButton
+                                            onClick={() => {
+                                                setBaseDate((prevDate) => {
+                                                    const newDate = new Date(prevDate)
+                                                    newDate.setDate(newDate.getDate() - 7)
+                                                    return newDate
+                                                })
+                                            }}
+                                        >
+                                            <ArrowLeft />
+                                        </IconButton>
+                                    )}
+                                    <DayOfWeek date={date} logs={logMap.get(dateFormat(date, '-')) ?? []} />
+                                    {index === 6 && (
+                                        <IconButton
+                                            onClick={() => {
+                                                setBaseDate((prevDate) => {
+                                                    const newDate = new Date(prevDate)
+                                                    newDate.setDate(newDate.getDate() + 7)
+                                                    return newDate
+                                                })
+                                            }}
+                                        >
+                                            <ArrowRight />
+                                        </IconButton>
+                                    )}
+                                </>
+                            )
                         })
                     }
                 </Stack>

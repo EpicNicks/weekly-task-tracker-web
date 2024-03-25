@@ -15,6 +15,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { P, match } from 'ts-pattern'
 import DailyViewAppbar from './DailyViewAppbar'
 import { invalidateToken } from '../../../../redux/services/authSlice'
+import WeeklyViewAppbar from './WeeklyViewAppbar'
 
 const drawerWidth = 200
 
@@ -127,6 +128,7 @@ export default function PersistentDrawer({ children }: PersistentDrawerProps) {
                             {
                                 match(currentView)
                                     .with('today-view', () => <DailyViewAppbar />)
+                                    .with('weekly-view', () => <WeeklyViewAppbar />)
                                     .otherwise(() => <></>)
                             }
                         </Stack>

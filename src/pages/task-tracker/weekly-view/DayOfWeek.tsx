@@ -19,7 +19,7 @@ export default function DayOfWeek(props: { date: Date, logs: DailyLog[] }) {
     }
 
     const daysOfTheWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-    const isToday = date.getDay() === (new Date()).getDay()
+    const isToday = dateFormat(date) === dateFormat(new Date())
 
     if (isLoading) {
         return <CircularProgress />
