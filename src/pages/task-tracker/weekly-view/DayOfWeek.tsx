@@ -113,14 +113,16 @@ export default function DayOfWeek(props: { date: Date, logs: DailyLog[] }) {
                     )
                 })
             }
-            <Box pt={2}>
-                <Card variant="elevation">
-                    <Stack direction="row" justifyContent="space-evenly" alignItems="center">
-                        <Typography sx={{ color: '#555' }}>Log a Task</Typography>
-                        <TaskLogButton addCircleProps={{ sx: { fontSize: '30px' } }} logButtonType="CREATE" />
-                    </Stack>
-                </Card>
-            </Box>
+            {date <= new Date() && (
+                <Box pt={2}>
+                    <Card variant="elevation">
+                        <Stack direction="row" justifyContent="space-evenly" alignItems="center">
+                            <Typography sx={{ color: '#555' }}>Log a Task</Typography>
+                            <TaskLogButton addCircleProps={{ sx: { fontSize: '30px' } }} logButtonType="CREATE" />
+                        </Stack>
+                    </Card>
+                </Box>
+            )}
         </Stack>
     )
 }

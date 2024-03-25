@@ -6,6 +6,9 @@ import DayOfWeek from './DayOfWeek'
 import { WeeklyProgressDisplay } from './WeeklyProgressDisplay'
 import { useState } from 'react'
 import { ArrowLeft, ArrowRight } from '@mui/icons-material'
+import { DatePicker } from '@mui/x-date-pickers'
+import { createPortal } from 'react-dom'
+import { DateTime } from 'luxon'
 
 
 function datesThisWeek(date: Date = new Date()) {
@@ -49,6 +52,27 @@ export default function WeeklyView() {
             }}
         >
             <Stack direction="column">
+                {
+                    (() => {
+                        const headerSlot = document.querySelector('#weekly-view-appbar-header-slot')
+                        if (headerSlot) {
+                            return createPortal(
+                                (
+                                    <DatePicker
+                                        timezone="America/Toronto"
+                                        value={DateTime.fromJSDate(thisWeekDates[0])}
+                                        onChange={(newValue) => {
+                                            if (newValue) {
+                                                setBaseDate(newValue.toJSDate())
+                                            }
+                                        }}
+                                    />
+                                ),
+                                headerSlot
+                            )
+                        }
+                    })()
+                }
                 <Stack
                     direction="row"
                     justifyContent="space-around"
