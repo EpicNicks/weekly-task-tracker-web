@@ -187,6 +187,32 @@ export default function Register() {
                                                         <StyledSubmitButton
                                                             type="submit"
                                                             variant="contained"
+                                                            sx={{
+                                                                backgroundColor: 'white',
+                                                                color: '#1976d2',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'white'
+                                                                }
+                                                            }}
+                                                            fullWidth
+                                                            disabled={registerResult.isLoading}
+                                                        >
+                                                            Register
+                                                        </StyledSubmitButton>
+                                                    </Container>
+                                                </Grid>
+                                                <Grid item>
+                                                    <Typography variant="body1" textAlign="center">
+                                                        Already have an account?
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Container>
+                                                        <StyledSubmitButton
+                                                            onClick={() => {
+                                                                navigate('/login')
+                                                            }}
+                                                            variant="contained"
                                                             color="primary"
                                                             fullWidth
                                                             disabled={registerResult.isLoading}

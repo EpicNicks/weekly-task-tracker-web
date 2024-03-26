@@ -30,7 +30,7 @@ const StyledTextField = styled(TextField)`
     /* width: 300px; */
 `
 
-const StyledSubmitButton = styled(Button)`
+const StyledButton = styled(Button)`
     margin: 0.25em;
     /* margin-top: 0.5em; */
     /* width: 300px; */
@@ -154,7 +154,7 @@ function Login() {
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     <Container>
-                                                        <StyledSubmitButton
+                                                        <StyledButton
                                                             type="submit"
                                                             variant="contained"
                                                             color="primary"
@@ -162,7 +162,28 @@ function Login() {
                                                             disabled={loginResult.isLoading}
                                                         >
                                                             Login
-                                                        </StyledSubmitButton>
+                                                        </StyledButton>
+                                                    </Container>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Container>
+                                                        <StyledButton
+                                                            onClick={() => {
+                                                                navigate('/register')
+                                                            }}
+                                                            sx={{
+                                                                backgroundColor: 'white',
+                                                                color: '#1976d2',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'white'
+                                                                }
+                                                            }}
+                                                            variant="contained"
+                                                            fullWidth
+                                                            disabled={loginResult.isLoading}
+                                                        >
+                                                            Register
+                                                        </StyledButton>
                                                     </Container>
                                                 </Grid>
                                             </Grid>
